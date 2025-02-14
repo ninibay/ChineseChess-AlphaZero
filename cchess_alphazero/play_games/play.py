@@ -241,6 +241,8 @@ class PlayWithHuman:
                     sprite_dest.kill()
                 chessman_sprite.move(x1, y1, self.chessman_w, self.chessman_h)
                 self.history.append(self.env.get_state())
+            else:
+                sleep(0.5)
 
     def draw_widget(self, screen, widget_background):
         white_rect = Rect(0, 0, self.screen_width - self.width, self.height)

@@ -202,8 +202,7 @@ class OptimizeWorker:
     def try_reload_model(self):
         logger.debug("check model")
         if need_to_reload_best_model_weight(self.model):
-            with self.model.graph.as_default():
-                load_best_model_weight(self.model)
+            load_best_model_weight(self.model)
             return True
         return False
 
