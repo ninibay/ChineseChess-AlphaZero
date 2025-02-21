@@ -306,12 +306,18 @@ class Chessboard(object):
     def print_to_cl(self, is_print = True):
         screen = "\r\n"
         for i in range(9, -1, -1):
+            screen += "{}| ".format(i)
             for j in range(9):
                 if self.__chessmans[j][i] != None:
                     screen += self.__chessmans[j][i].name_cn
                 else:
                     screen += "   .   "
             screen += "\r\n" * 3
+        
+        screen += "   "
+        for j in range(9):
+            screen += "   {}   ".format(j)
+
         if is_print:
             print(screen)
         else:
