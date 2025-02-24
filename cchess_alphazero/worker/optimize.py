@@ -27,7 +27,8 @@ from cchess_alphazero.lib.web_helper import http_request
 from keras.optimizers import SGD
 from keras.callbacks import TensorBoard
 # from keras.utils import multi_gpu_model
-import keras.backend as K
+# import keras.backend as K
+import tensorflow as tf
 
 logger = getLogger(__name__)
 
@@ -108,31 +109,21 @@ class OptimizeWorker:
     def train_epoch(self, epochs):
         tc = self.config.trainer
         state_ary, policy_ary, value_ary = self.collect_all_loaded_data()
-        tensorboard_cb = TensorBoard(log_dir="./logs", batch_size=tc.batch_size, histogram_freq=1)
-        if self.config.opts.use_multiple_gpus:
-            self.mg_model.fit(state_ary, [policy_ary, value_ary],
-                                 batch_size=tc.batch_size,
-                                 epochs=epochs,
-                                 shuffle=True,
-                                 validation_split=0.02,
-                                 callbacks=[tensorboard_cb])
-        else:
-            self.model.model.fit(state_ary, [policy_ary, value_ary],
-                                 batch_size=tc.batch_size,
-                                 epochs=epochs,
-                                 shuffle=True,
-                                 validation_split=0.02,
-                                 callbacks=[tensorboard_cb])
+        tensorboard_cb = TensorBoard(log_dir="./logs", histogram_freq=1)
+        self.model.model.fit(state_ary, [policy_ary, value_ary],
+                                batch_size=tc.batch_size,
+                                epochs=epochs,
+                                shuffle=True,
+                                validation_split=0.02,
+                                callbacks=[tensorboard_cb])
         steps = (state_ary.shape[0] // tc.batch_size) * epochs
         return steps
 
     def compile_model(self):
-        self.opt = SGD(lr=0.02, momentum=self.config.trainer.momentum)
+        self.opt = SGD(learning_rate=0.02, momentum=self.config.trainer.momentum)
         losses = ['categorical_crossentropy', 'mean_squared_error']
-        if self.config.opts.use_multiple_gpus:
-            self.mg_model = multi_gpu_model(self.model.model, gpus=self.config.opts.gpu_num)
-            self.mg_model.compile(optimizer=self.opt, loss=losses, loss_weights=self.config.trainer.loss_weights)
-        else:
+        strategy = tf.distribute.MirroredStrategy()
+        with strategy.scope():
             self.model.model.compile(optimizer=self.opt, loss=losses, loss_weights=self.config.trainer.loss_weights)
 
     def update_learning_rate(self, total_steps):
@@ -143,7 +134,8 @@ class OptimizeWorker:
 
         lr = self.decide_learning_rate(total_steps)
         if lr:
-            K.set_value(self.opt.lr, lr)
+            #K.set_value(self.opt.lr, lr)
+            self.opt.learning_rate.assign(lr)
             logger.debug(f"total step={total_steps}, set learning rate to {lr}")
 
     def fill_queue(self):

@@ -100,6 +100,8 @@ class CChessModel:
             else:
                 logger.debug(f"build model")
                 self.build()
+                with open(config_path, "wt") as f:
+                    json.dump(self.model.get_config(), f)
             self.model.load_weights(weight_path)
             self.digest = self.fetch_digest(weight_path)
             logger.debug(f"loaded model digest = {self.digest}")

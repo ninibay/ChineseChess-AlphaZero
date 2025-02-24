@@ -8,7 +8,7 @@ from cchess_alphazero.config import Config, PlayWithHumanConfig
 
 logger = getLogger(__name__)
 
-CMD_LIST = ['self', 'opt', 'eval', 'play', 'eval', 'sl', 'ob']
+CMD_LIST = ['self', 'opt', 'play', 'eval', 'sl', 'ob']
 PIECE_STYLE_LIST = ['WOOD', 'POLISH', 'DELICATE']
 BG_STYLE_LIST = ['CANVAS', 'DROPS', 'GREEN', 'QIANHONG', 'SHEET', 'SKELETON', 'WHITE', 'WOOD']
 RANDOM_LIST = ['none', 'small', 'medium', 'large']

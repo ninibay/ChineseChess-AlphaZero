@@ -177,6 +177,7 @@ class PlayWithHuman:
             self.chessmans.update()
             self.chessmans.draw(screen)
             pygame.display.update()
+            sleep(0.01)
 
         self.ai.close(wait=False)
         logger.info(f"Winner is {self.env.board.winner} !!!")
